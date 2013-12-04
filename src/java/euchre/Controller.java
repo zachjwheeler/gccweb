@@ -37,6 +37,7 @@ public class Controller extends HttpServlet {
             HttpServletResponse response, boolean post)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        String username = (String)session.getAttribute("username");
         if(post && request.getHeader("Ajax") != null) {
             response.setContentType("application/xml;charset=UTF-8");
             PrintWriter out = response.getWriter();
@@ -68,7 +69,8 @@ public class Controller extends HttpServlet {
                     }
                 } else if(request.getHeader("Ajax").equals("set")) {
                     String action = request.getHeader("action");
-                    out.println("<success>" + game.tryAction(action) + "</success>");
+                    String actiondata = request.getHeader("actiondata");
+                    out.println("<success>" + game.tryAction(username, action, actiondata) + "</success>");
                 } else {
                     //?
                 }
@@ -76,7 +78,6 @@ public class Controller extends HttpServlet {
                 out.close();
             }
         } else {
-            String username = (String)session.getAttribute("username");
             if(post && (username == null || username.equals(""))) {
                 username = request.getParameter("username");
                 String password = request.getParameter("password");

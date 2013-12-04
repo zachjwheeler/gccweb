@@ -99,7 +99,11 @@ public class Game {
         return bean;
     }
 
-    public String tryAction(String action) {
+    public String tryAction(String username, String action, String actiondata) {
+        if(username == null || username.equals(""))
+            return "crash";
+        
+        
         
         return "invalid";
     }

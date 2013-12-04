@@ -20,12 +20,16 @@ function Game() {
 function Card() {
     this.suit = ''
     this.type = ''
+    
+    this.toString = function() {
+        return this.type + this.suit
+    }
 }
 
 function ajaxparseobj(doc) {
     var game = new Game()
     game.trump = doc.getElementsByTagName('trump').item(0).childNodes[0].data
-    if(game.trump == 'none')
+    if(game.trump === 'none')
         game.trump = ''
     game.cards = ajaxgetcards(doc.getElementsByTagName('cards').item(0))
     game.ontable = ajaxgetcards(doc.getElementsByTagName('ontable').item(0))
@@ -60,7 +64,7 @@ function ajaxupdategame(callback) {
     if(req) {
         req.open("POST", "ctrl", true)
         req.onreadystatechange = function() {
-            if(req.readyState == 4 && req.status == 200)
+            if(req.readyState === 4 && req.status === 200)
                 callback(ajaxparseobj(req.responseXML.documentElement))
         }
         req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -75,7 +79,7 @@ function ajaxget(resource, callback) {
     if(req) {
         req.open("POST", "ctrl", true)
         req.readystateonchange = function() {
-            if(req.readyState == 4 && req.status == 200)
+            if(req.readyState === 4 && req.status === 200)
                 callback(req.responseXML.documentElement.childNodes[0].data)
         }
         req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -98,8 +102,8 @@ function ajaxaction(action, actiondata, callback) {
     var req = new XMLHttpRequest()
     if(req) {
         req.open('POST', 'ctrl', true)
-        req.readystateonchange = function() {
-            if(req.readyState == 4 && req.status == 200)
+        req.onreadystatechange = function() {
+            if(req.readyState === 4 && req.status === 200)
                 callback(req.responseXML.documentElement.childNodes[0].data)
         }
         req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -110,6 +114,26 @@ function ajaxaction(action, actiondata, callback) {
     }
 }
 
-function ajaxsingle(request) {
-    return request.responseXML.documentElement.childNodes[0].data
+
+/// Can leave off actiondata if it's not needed, eg doaction('deal')
+function doaction(action, actiondata) {
+    if(typeof actiondata === null)
+        actiondata = ''
+    ajaxaction(action, actiondata, 
+        function(result) {
+            if(result !== 'true') {
+                alert('Either we\'ve experienced a bug, or you\'re trying to hack the game.')
+            } else {
+                update()
+            }
+        }
+    );
+}
+
+gameobj = null
+function update() {
+    ajaxupdategame(function(obj) {
+        updatehtml(gameobj, obj)
+        gameobj = obj
+    })
 }

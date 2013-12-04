@@ -12,25 +12,36 @@
         <script src='interface.js'></script>
         <script type='text/javascript'>
             function init() {
-                oldgame = new Game();
-                game = new Game();
-                
                 update();
-                setInterval(update, 1000)
+                setInterval(update, 2000)
             }
-            function update() {
-                oldgame = game
-                ajaxupdategame(function(obj) {
-                    game = obj
-                    updatehtml()
-                });
+            
+            function getimghtml(filename) {
+                return '<img class="card" src="PlayingCards/' + filename + '.png" alt="' + filename + ' "/>'
             }
+            
+            function displaycards(top, cardlist, onedown) {
+                top.innerHTML = ''
+                for(var i=0; i < cardlist.length; ++i) {
+                    top.innerHTML += getimghtml(cardlist[i].type + cardlist[i].suit)
+                }
+                if(onedown) {
+                    top.innerHTML += getimghtml('back')
+                }
+            }
+            
+            function setdisabled(id, yes) {
+                var b = document.getElementById(id)
+                if(b)
+                    b.disabled = yes
+            }
+            
             function updatehtml() {
                 if(diff('trump')) {
                     
                 }
                 if(diff('players')) {
-                    if(oldgame.players.length != game.players.length)
+                    if(oldgame.players.length !== game.players.length)
                         document.getElementById('playercount').childNodes[0].data = game.players.length
                 }
                 if(diff('cards')) {
@@ -62,7 +73,7 @@
                 }
             }
             function diff(v) {
-                return oldgame[v].toString() !== game[v].toString()
+                return oldgame === null || oldgame[v].toString() !== game[v].toString()
             }
         </script>
     </head>
