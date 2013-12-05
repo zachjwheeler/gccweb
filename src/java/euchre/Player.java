@@ -52,6 +52,10 @@ public class Player {
     public void addTrick() {
         ourTricks++;
     }
+    public void addScore(int score) {
+        ourScore += score;
+        //cap @ 10?
+    }
     
     public String getPassword() {
         return password;

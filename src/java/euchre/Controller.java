@@ -7,7 +7,9 @@ package euchre;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,9 +19,11 @@ import javax.servlet.http.HttpSession;
 
 public class Controller extends HttpServlet {
     private Game game;
+    private Set<String> bootList;
     
     public Controller() {
         game = new Game();
+        bootList = new HashSet<String>();
     }
     
     private void xmlcards(PrintWriter out, String top, List<Card> cards) {
@@ -39,7 +43,17 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         String username = (String)session.getAttribute("username");
+        if(game.shouldBoot()) {
+            bootList.addAll(game.getPlayerUsernames());
+            game = new Game();
+        }
         if(post && request.getHeader("Ajax") != null) {
+            if(bootList.contains(username)) {
+                session.invalidate();
+                response.sendRedirect("index.jsp");
+                bootList.remove(username);
+                return;
+            }
             response.setContentType("application/xml;charset=UTF-8");
             PrintWriter out = response.getWriter();
             try {

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Game {
@@ -17,6 +18,7 @@ public class Game {
     private int bidWinner;
     private Card trumpCard;
     private boolean alone;
+    private long gameEnded;
     private Card[] deck;
     private int deckposn;
     
@@ -35,6 +37,15 @@ public class Game {
                 deck[idx++] = new Card(suit, type);
             }
         }
+        gameEnded = -1;
+    }
+    
+    public Set<String> getPlayerUsernames() {
+        return players.keySet();
+    }
+    
+    public boolean shouldBoot() {
+        return gameEnded != -1 && System.currentTimeMillis() - gameEnded > 10*1000;
     }
     
     private void clearVars() {
@@ -60,17 +71,6 @@ public class Game {
         return players.size() == 4;
     }
     
-    private void startGame() {
-        Collections.shuffle(playerOrder);
-        shuffle();
-    }
-    private void endGame() {
-        players.clear();
-        playerOrder.clear();
-        onTable.clear();
-        clearVars();
-    }
-    
     public boolean tryAddPlayer(String username, String password) {
         if(players.containsKey(username))
             return players.get(username).getPassword().equals(password);
@@ -78,8 +78,6 @@ public class Game {
             return false;
         players.put(username, new Player(password));
         playerOrder.add(username);
-        if(players.size() == 4)
-            startGame();
         return true;
     }
     
@@ -221,6 +219,14 @@ public class Game {
         a.addTrick();
         b.addTrick();
     }
+    private boolean sameTeam(int a, int b) {
+        return a==b || a==partner(b);
+    }
+    private void addScore(int v, int score) {
+        Player a = players.get(playerOrder.get(v)), b = players.get(playerOrder.get(partner(v)));
+        a.addScore(score);
+        b.addScore(score);
+    }
     
     private Map<String, Action> actionMap = new HashMap<String, Action>() {{
         put("deal", new Action() {
@@ -263,7 +269,21 @@ public class Game {
                             int winner = winTable();
                             addTrick(winner);
                             if(p.cardCount() == 0) {
-                                //TODO: update scores, change phase
+                                int roundwinner = winner;
+                                if(players.get(playerOrder.get(roundwinner)).getOurTricks() <
+                                        players.get(playerOrder.get(next(roundwinner))).getOurTricks()) {
+                                    roundwinner = next(roundwinner);
+                                }
+                                //heh heh, gotta love ternary operator
+                                addScore(roundwinner, sameTeam(bidWinner, roundwinner) ? alone ? 4 : 1 : 2);
+                                
+                                if(players.get(playerOrder.get(roundwinner)).getOurScore() >= 10 ||
+                                        players.get(playerOrder.get(next(roundwinner))).getOurScore() >= 10) {
+                                    setPhaseAll("end");
+                                    gameEnded = System.currentTimeMillis();
+                                } else {
+                                    setPhaseAll("preround");
+                                }
                             }
                             playerTurn = winner;
                         } else {
