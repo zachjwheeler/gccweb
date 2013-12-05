@@ -203,7 +203,7 @@ public class Game {
     }
     
     private int winTable() {
-        int lead = next(playerTurn);
+        int lead = (playerTurn - onTable.size() + players.size()) % players.size();
         int idx=0;
         for(int i=1; i < onTable.size(); ++i) {
             Card top = onTable.get(idx);
