@@ -57,4 +57,15 @@ public class Player {
         cards.clear();
         ourTricks = 0;
     }
+    
+    public boolean hasCard(Card card) {
+        return cards.contains(card);
+    }
+    
+    public Card playCard(Card card) {
+        int idx = cards.indexOf(card);
+        Card r = cards.get(idx);
+        cards.remove(idx);
+        return r;
+    }
 }

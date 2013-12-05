@@ -17,8 +17,9 @@ public class Game {
     private Card trumpCard;
     private Card[] deck;
     private int deckposn;
-    private final String[] suits = new String[]{"c","d","h","s"};
-    private final String[] types = new String[]{"a","k","q","j","10","9"};
+    
+    public final static String[] suits = new String[]{"c","d","h","s"};
+    public final static String[] types = new String[]{"a","k","q","j","10","9"};
     
     public Game() {
         players = new HashMap<String, Player>();
@@ -160,6 +161,17 @@ public class Game {
         put("play", new Action() {
             public String go(String username, String data) {
                 Player p = players.get(username);
+                if(p.getPhase().equals("tricks")) {
+                    Card card = Card.fromString(data);
+                    if(card == null)
+                        return "invalid data";
+                    if(p.hasCard(card)) {
+                        onTable.add(p.playCard(card));
+                        if(onTable.size() == players.size()) {
+                            //TODO: game logic
+                        }
+                    }
+                }
                 return "false";
             }
         });
@@ -200,12 +212,14 @@ public class Game {
                 Player p = players.get(username);
                 if(p.getPhase().equals("pregame")) {
                     p.setPhase("ready");
-                    boolean move=true;
-                    for(Player pp : players.values())
-                        if(!pp.getPhase().equals("ready"))
-                            move=false;
-                    if(move)
-                        setPhaseAll("preround");
+                    if(players.size() == 4) {
+                        boolean move=true;
+                        for(Player pp : players.values())
+                            if(!pp.getPhase().equals("ready"))
+                                move=false;
+                        if(move)
+                            setPhaseAll("preround");
+                    }
                     return "true";
                 }
                 return "false";
@@ -215,10 +229,11 @@ public class Game {
             public String go(String username, String data) {
                 Player p = players.get(username);
                 if(p.getPhase().equals("pregame")) {
-                    if(data != null && !data.equals("") && !players.containsKey(data))
-                        return "invalid data";
-                    p.setTeammate(data == null ? "" : data);
-                    return "true";
+                    if(data == null || data.equals("") || 
+                            (!data.equals(username) && players.containsKey(data))) {
+                        p.setTeammate(data == null ? "" : data);
+                        return "true";
+                    }
                 }
                 return "false";
             }

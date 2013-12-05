@@ -119,7 +119,7 @@ function ajaxget(resource, callback) {
 ///   "true": the action was completed successfully.
 ///   "false": the action could not be completed, e.g. not your turn.
 ///   "invalid action": there is no action called by the given name.
-///   "invalid data": ...
+///   "invalid data": data string was not in an acceptable format
 ///   "crash": there's a bug server-side
 /// If you get "false" or "invalid", I would expect that either there's a bug
 //   or the user is trying to hack the system.
