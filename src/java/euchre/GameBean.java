@@ -9,6 +9,32 @@ public class GameBean implements java.io.Serializable {
     private int dealer;//0 means me
     private String trump;
     private int bidWinner, ourScore, theirScore, ourTricks, theirTricks;
+    private Card trumpCard;
+    private String teammate, phase;
+
+    public String getTeammate() {
+        return teammate;
+    }
+
+    public void setTeammate(String teammate) {
+        this.teammate = teammate;
+    }
+
+    public String getPhase() {
+        return phase;
+    }
+
+    public void setPhase(String phase) {
+        this.phase = phase;
+    }
+
+    public Card getTrumpCard() {
+        return trumpCard;
+    }
+
+    public void setTrumpCard(Card trumpCard) {
+        this.trumpCard = trumpCard;
+    }
 
     public int getBidWinner() {
         return bidWinner;

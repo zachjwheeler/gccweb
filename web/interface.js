@@ -11,18 +11,29 @@ function Game() {
     this.theirscore=0
     this.ourtricks=0
     this.theirtricks=0
+    this.trumpcard = new Card()
+    this.phase = 'pregame'   // options: 'pregame', 'ready', 'preround', 'bidding', 'tricks'
+    this.teammate = ''       // the requested or present teammate's username
     
     this.partner = function(idx) {
         return (idx+2)%players.length
     }
+    
+    // Assuming the game's in bidding phase
+    this.isFirstBiddingRound = function() {
+        return this.trumpcard.isReal()
+    }
 }
 
-function Card() {
-    this.suit = ''
-    this.type = ''
+function Card(s, t) {
+    this.suit = typeof s === 'undefined' ? '' : s
+    this.type = typeof t === 'undefined' ? '' : t
     
     this.toString = function() {
-        return this.type + this.suit
+        return this.isReal() ? this.type + this.suit : 'back'
+    }
+    this.isReal = function() {
+        return this.type !== '' && this.type !== ''
     }
 }
 
@@ -37,6 +48,17 @@ function ajaxparseobj(doc) {
     for(var i=0; i < playerlist.length; ++i) {
         game.players.push(playerlist.item(0).childNodes[0].data)
     }
+    game.trumpcard = ajaxgetcards(doc.getElementsByTagName('trumpcard').item(0))
+    if(game.trumpcard.length > 0)
+        game.trumpcard = game.trumpcard[0]
+    else
+        game.trumpcard = new Card()
+    game.teammate = doc.getElementsByTagName('teammate').item(0).childNodes[0]
+    if(typeof game.teammate === 'undefined')
+        game.teammate = ''
+    else
+        game.teammate = game.teammate.data
+    game.phase = doc.getElementsByTagName('phase').item(0).childNodes[0].data
     game.playerturn = parseInt(doc.getElementsByTagName('playerturn').item(0).childNodes[0].data)
     game.dealer = parseInt(doc.getElementsByTagName('dealer').item(0).childNodes[0].data)
     game.bidwinner = parseInt(doc.getElementsByTagName('bidwinner').item(0).childNodes[0].data)
@@ -51,12 +73,16 @@ function ajaxgetcards(top) {
     var cardlist = top.getElementsByTagName('card')
     var ret = new Array()
     for(var i=0; i < cardlist.length; ++i) {
-        var next = new Card()
-        next.suit = cardlist.item(i).getElementsByTagName('suit').item(0).childNodes[0].data
-        next.type = cardlist.item(i).getElementsByTagName('type').item(0).childNodes[0].data
-        ret.push(next)
+        ret.push(getcard(cardlist.item(i)))
     }
     return ret
+}
+
+function getcard(top) {
+    var next = new Card()
+    next.suit = top.getElementsByTagName('suit').item(0).childNodes[0].data
+    next.type = top.getElementsByTagName('type').item(0).childNodes[0].data
+    return next
 }
 
 function ajaxupdategame(callback) {
@@ -89,11 +115,11 @@ function ajaxget(resource, callback) {
     }
 }
 
-/// Not yet implemented
-/// Response will be one of "true", "false", and "invalid".
+/// Response will be one of "true", "false", "invalid", and "crash".
 ///   "true": the action was completed successfully.
 ///   "false": the action could not be completed, e.g. not your turn.
 ///   "invalid": there is no action called by the given name.
+///   "crash": there's a bug server-side
 /// If you get "false" or "invalid", I would expect that either there's a bug
 //   or the user is trying to hack the system.
 /// Check for all three to make debugging easier, but if the client code is
@@ -115,9 +141,20 @@ function ajaxaction(action, actiondata, callback) {
 }
 
 
-/// Can leave off actiondata if it's not needed, eg doaction('deal')
+// Can leave off actiondata if it's not needed, eg doaction('deal')
+/***** List of actions ******
+ * 'deal': shuffle & deal cards to everyone to start a round
+ * 'play', card: play the card given by 'card', eg doaction('play', '2c') for
+ *             the 2 of clubs. The toString() method in Card will give you '2c', etc.
+ * 'declare trump', trump: declare trump, 'trump' is ignored if it's the first
+ *                        round of bidding.
+ * 'pass': used during bidding rounds
+ * 'begin': player considers himself ready to begin the game, valid during 'pregame' phase
+ * 'request teammate', teammate: valid during 'pregame' phase, sending this multiple times
+ *                               is supported
+ */
 function doaction(action, actiondata) {
-    if(typeof actiondata === null)
+    if(typeof actiondata === 'undefined')
         actiondata = ''
     ajaxaction(action, actiondata, 
         function(result) {

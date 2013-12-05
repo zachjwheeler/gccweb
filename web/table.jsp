@@ -13,7 +13,7 @@
         <script type='text/javascript'>
             function init() {
                 update();
-                setInterval(update, 2000)
+                setInterval(update, 1000)
             }
             
             function getimghtml(filename) {
@@ -36,12 +36,16 @@
                     b.disabled = yes
             }
             
-            function updatehtml() {
+            function updatehtml(oldgame, game) {
+                function diff(v) {
+                    return oldgame === null || oldgame[v].toString() !== game[v].toString()
+                }
+                
                 if(diff('trump')) {
                     
                 }
                 if(diff('players')) {
-                    if(oldgame.players.length !== game.players.length)
+                    if(oldgame === null || oldgame.players.length !== game.players.length)
                         document.getElementById('playercount').childNodes[0].data = game.players.length
                 }
                 if(diff('cards')) {
@@ -71,9 +75,15 @@
                 if(diff('theirtricks')) {
                     
                 }
-            }
-            function diff(v) {
-                return oldgame === null || oldgame[v].toString() !== game[v].toString()
+                if(diff('trumpcard')) {
+                    
+                }
+                if(diff('phase')) {
+                    
+                }
+                if(diff('teammate')) {
+                    
+                }
             }
         </script>
     </head>

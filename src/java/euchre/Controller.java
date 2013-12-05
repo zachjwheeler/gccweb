@@ -6,8 +6,8 @@ package euchre;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import javax.servlet.RequestDispatcher;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,9 +22,10 @@ public class Controller extends HttpServlet {
         game = new Game();
     }
     
-    private void xmlcards(PrintWriter out, String top, ArrayList<Card> cards) {
+    private void xmlcards(PrintWriter out, String top, List<Card> cards) {
         out.println("<" + top + ">");
         for(Card card : cards) {
+            if(card == null) continue;
             out.println("<card>");
             out.println("<suit>" + card.suit + "</suit>");
             out.println("<type>" + card.type + "</type>");
@@ -55,6 +56,9 @@ public class Controller extends HttpServlet {
                             for(String player : bean.getPlayers()) {
                                 out.println("<player>" + player + "</player>");
                             }
+                            xmlcards(out, "trumpcard", Arrays.asList(bean.getTrumpCard()));
+                            out.println("<teammate>" + bean.getTeammate() + "</teammate>");
+                            out.println("<phase>" + bean.getPhase() + "</phase>");
                             out.println("<playerturn>" + bean.getPlayerTurn() + "</playerturn>");
                             out.println("<dealer>" + bean.getDealer() + "</dealer>");
                             out.println("<bidwinner>" + bean.getBidWinner() + "</bidwinner>");
