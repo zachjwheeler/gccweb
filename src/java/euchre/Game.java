@@ -361,6 +361,7 @@ public class Game {
                             setPhaseAll("preround");
                             dealer = (int)(Math.random()*playerOrder.size());
                             alone = false;
+                            playerTurn=next(dealer);
                             
                             // Assign teammates: satisfy any mutual preferences,
                             //  and if there are none, satisfy the first player
