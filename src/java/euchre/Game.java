@@ -153,6 +153,7 @@ public class Game {
                     trumpCard = draw();
                     setPhaseAll("bidding");
                     playerTurn = next(dealer);
+                    onTable.clear();
                     return "true";
                 }
                 return "false";
