@@ -113,7 +113,7 @@ public class Game {
 
     public String tryAction(String username, String action, String actiondata) {
         if(username == null || username.equals(""))
-            return "invalid";
+            return "invalid action";
         
         Action a = actionMap.get(action);
         if(a == null)
@@ -136,7 +136,8 @@ public class Game {
     }
     private int next(int v) {
         v = (v+1)%players.size();
-        if(alone && partner(bidWinner) == v)
+        if(players.get(playerOrder.get(v)).getPhase().equals("tricks") && 
+                alone && partner(bidWinner) == v)
             return (v+1)%players.size();
         return v;
     }
@@ -283,6 +284,7 @@ public class Game {
                                     gameEnded = System.currentTimeMillis();
                                 } else {
                                     setPhaseAll("preround");
+                                    dealer = next(dealer);
                                 }
                             }
                             playerTurn = winner;
@@ -355,8 +357,41 @@ public class Game {
                         for(Player pp : players.values())
                             if(!pp.getPhase().equals("ready"))
                                 move=false;
-                        if(move)
+                        if(move) {
                             setPhaseAll("preround");
+                            dealer = (int)(Math.random()*playerOrder.size());
+                            alone = false;
+                            
+                            // Assign teammates: satisfy any mutual preferences,
+                            //  and if there are none, satisfy the first player
+                            //  who has a preference in order of when they
+                            //  joined the game.
+                            int to[] = new int[playerOrder.size()];
+                            for(int i=0; i < playerOrder.size(); ++i) {
+                                String teammate = players.get(playerOrder.get(i)).getTeammate();
+                                if(teammate == null || teammate.equals(""))
+                                    to[i]=-1;
+                                else
+                                    to[i] = playerOrder.indexOf(teammate);
+                            }
+                            boolean done=false;
+                            for(int i=0; i < playerOrder.size() && !done; ++i) {
+                                for(int j=i+1; j < playerOrder.size() && !done; ++j) {
+                                    if(to[i] == j && to[j] == i) {
+                                        done=true;
+                                        if(((i+j)&1) == 1)
+                                            Collections.swap(playerOrder, j, next(j));
+                                    }
+                                }
+                            }
+                            for(int i=0; i < playerOrder.size() && !done; ++i) {
+                                if(to[i] != -1) {
+                                    done=true;
+                                    if(((i+to[i])&1) == 1)
+                                        Collections.swap(playerOrder, to[i], next(to[i]));
+                                }
+                            }
+                        }
                     }
                     return "true";
                 }
