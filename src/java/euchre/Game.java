@@ -164,6 +164,17 @@ public class Game {
         });
         put("declare trump", new Action() {
             public boolean go(String username, String data) {
+                Player p = players.get(username);
+                if(p.getPhase().equals("bidding") && playerTurn == playerOrder.indexOf(username)) {
+                    if(trumpCard == null) {
+                        trump = data;
+                    } else {
+                        trump = trumpCard.suit;
+                    }
+                    playerTurn = next(dealer);
+                    setPhaseAll("tricks");
+                    return true;
+                }
                 return false;
             }
         });
@@ -176,6 +187,7 @@ public class Game {
                     if(playerTurn == dealer)
                         trumpCard = null;
                     playerTurn = next(playerTurn);
+                    return true;
                 }
                 return false;
             }
