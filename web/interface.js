@@ -4,7 +4,7 @@ function Game() {
     this.players = new Array()
     this.cards = new Array()
     this.ontable = new Array()
-    this.playerturn=-1
+    this.playerturn=-1         // left-of-dealer = 1
     this.dealer=-1
     this.bidwinner=-1
     this.ourscore=0

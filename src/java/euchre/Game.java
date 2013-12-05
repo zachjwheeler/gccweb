@@ -131,6 +131,9 @@ public class Game {
         for(Player pp : players.values())
             pp.setPhase(phase);
     }
+    private int next(int v) {
+        return (v+1)%players.size();
+    }
     
     private Map<String, Action> actionMap = new HashMap<String, Action>() {{
         put("deal", new Action() {
@@ -148,6 +151,7 @@ public class Game {
                     }
                     trumpCard = draw();
                     setPhaseAll("bidding");
+                    playerTurn = next(dealer);
                     return true;
                 }
                 return false;
@@ -165,6 +169,14 @@ public class Game {
         });
         put("pass", new Action() {
             public boolean go(String username, String data) {
+                Player p = players.get(username);
+                // can't pass if it's the second round of bidding & you're the dealer
+                if(p.getPhase().equals("bidding") && playerTurn == playerOrder.indexOf(username) &&
+                        (trumpCard != null || playerTurn != dealer)) {
+                    if(playerTurn == dealer)
+                        trumpCard = null;
+                    playerTurn = next(playerTurn);
+                }
                 return false;
             }
         });
