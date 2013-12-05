@@ -57,6 +57,7 @@ public class Controller extends HttpServlet {
                                 out.println("<player>" + player + "</player>");
                             }
                             xmlcards(out, "trumpcard", Arrays.asList(bean.getTrumpCard()));
+                            out.println("<alone>" + bean.isAlone() + "</alone>");
                             out.println("<teammate>" + bean.getTeammate() + "</teammate>");
                             out.println("<phase>" + bean.getPhase() + "</phase>");
                             out.println("<playerturn>" + bean.getPlayerTurn() + "</playerturn>");

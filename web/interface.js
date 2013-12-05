@@ -12,8 +12,9 @@ function Game() {
     this.ourtricks=0
     this.theirtricks=0
     this.trumpcard = new Card()
-    this.phase = 'pregame'   // options: 'pregame', 'ready', 'preround', 'bidding', 'tricks', 'end'
+    this.phase = 'pregame'   // options: 'pregame', 'ready', 'preround', 'bidding', 'discard', 'tricks', 'end'
     this.teammate = ''       // the requested or present teammate's username
+    this.alone = false
     
     this.partner = function(idx) {
         return (idx+2)%players.length
@@ -58,6 +59,7 @@ function ajaxparseobj(doc) {
         game.teammate = ''
     else
         game.teammate = game.teammate.data
+    game.alone = (doc.getElementsByTagName('alone').item(0).childNodes[0].data === 'true')
     game.phase = doc.getElementsByTagName('phase').item(0).childNodes[0].data
     game.playerturn = parseInt(doc.getElementsByTagName('playerturn').item(0).childNodes[0].data)
     game.dealer = parseInt(doc.getElementsByTagName('dealer').item(0).childNodes[0].data)
@@ -147,12 +149,19 @@ function ajaxaction(action, actiondata, callback) {
  * 'deal': shuffle & deal cards to everyone to start a round
  * 'play', card: play the card given by 'card', eg doaction('play', '2c') for
  *             the 2 of clubs. The toString() method in Card will give you '2c', etc.
- * 'declare trump', trump: declare trump, 'trump' is ignored if it's the first
- *                        round of bidding.
+ * 'declare trump', trump, alone: declare trump, 'trump' is ignored if it's the first
+ *                                round of bidding. If the player wants to go it alone,
+ *                                append ":alone" to the end of trump, like so:
+ *                                    doaction('declare trump', 's:alone')
+ *                                or
+ *                                    doaction('declare trump', ':alone')
  * 'pass': used during bidding rounds
  * 'begin': player considers himself ready to begin the game, valid during 'pregame' phase
  * 'request teammate', teammate: valid during 'pregame' phase, sending this multiple times
  *                               is supported
+ * 'discard', card: discard the card given by 'card', for use by dealer when he 
+ *                  is told to "pick it up" during the first bidding round
+ *                  (ie after someone sends 'declare trump' during first bidding round)
  */
 function doaction(action, actiondata) {
     if(typeof actiondata === 'undefined')

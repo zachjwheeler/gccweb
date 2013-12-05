@@ -11,6 +11,15 @@ public class GameBean implements java.io.Serializable {
     private int bidWinner, ourScore, theirScore, ourTricks, theirTricks;
     private Card trumpCard;
     private String teammate, phase;
+    private boolean alone;
+
+    public boolean isAlone() {
+        return alone;
+    }
+
+    public void setAlone(boolean alone) {
+        this.alone = alone;
+    }
 
     public String getTeammate() {
         return teammate;

@@ -4,7 +4,7 @@ package euchre;
 import java.util.ArrayList;
 
 public class Player {
-    ArrayList<Card> cards;
+    private ArrayList<Card> cards;
     private int ourScore, ourTricks;
     private String teammate, phase;
     final private String password;
@@ -49,6 +49,10 @@ public class Player {
         return ourTricks;
     }
     
+    public void addTrick() {
+        ourTricks++;
+    }
+    
     public String getPassword() {
         return password;
     }
@@ -62,10 +66,14 @@ public class Player {
         return cards.contains(card);
     }
     
-    public Card playCard(Card card) {
+    public Card removeCard(Card card) {
         int idx = cards.indexOf(card);
         Card r = cards.get(idx);
         cards.remove(idx);
         return r;
+    }
+    
+    public int cardCount() {
+        return cards.size();
     }
 }

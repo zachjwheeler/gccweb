@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class Game {
     private Map<String, Player> players;
@@ -15,6 +16,7 @@ public class Game {
     private String trump;
     private int bidWinner;
     private Card trumpCard;
+    private boolean alone;
     private Card[] deck;
     private int deckposn;
     
@@ -40,6 +42,7 @@ public class Game {
         trump = "";
         trumpCard = null;
         deckposn=0;
+        alone = false;
     }
     
     public void shuffle() {
@@ -106,6 +109,7 @@ public class Game {
         bean.setTheirTricks(opponent.getOurTricks());
         bean.setTeammate(player.getTeammate());
         bean.setPhase(player.getPhase());
+        bean.setAlone(alone);
         return bean;
     }
 
@@ -133,7 +137,89 @@ public class Game {
             pp.setPhase(phase);
     }
     private int next(int v) {
-        return (v+1)%players.size();
+        v = (v+1)%players.size();
+        if(alone && partner(bidWinner) == v)
+            return (v+1)%players.size();
+        return v;
+    }
+    private int partner(int v) {
+        return (v+2)%players.size();
+    }
+    
+    private static final String[] trumptypeplace = new String[]{"j","a","k","q","10","9"};
+    private static final String[] typeplace = new String[]{"a","k","q","j","10","9"};
+    private boolean cardLess(Card a, Card b) {
+        if(sameSuit(a,b)) {
+            if(isTrump(a)) {
+                if(a.type.equals(b.type)) {
+                    if(a.type.equals("j") && !a.suit.equals(b.suit))
+                        return b.suit.equals(trump);
+                } else {
+                    return Arrays.asList(trumptypeplace).indexOf(a.type) > 
+                            Arrays.asList(trumptypeplace).indexOf(b.type);
+                }
+            } else {
+                return Arrays.asList(typeplace).indexOf(a.type) >
+                        Arrays.asList(typeplace).indexOf(b.type);
+            }
+            return false;
+        }
+        // a & b different suits
+        if(!onTable.isEmpty() && sameSuit(a, onTable.get(0)))
+            return isTrump(b);
+        if(!onTable.isEmpty() && sameSuit(b, onTable.get(0)))
+            return !isTrump(a);
+        return false;
+    }
+    private boolean isTrump(Card card) {
+        return card.suit.equals(trump) || card.equals(leftBower());
+    }
+    private boolean sameSuit(Card a, Card b) {
+        boolean ta = isTrump(a), tb = isTrump(b);
+        return (ta && tb) || (!ta && !tb && a.suit.equals(b.suit));
+    }
+    private Card leftBower() {
+        Card r = new Card(null, "j");
+        if(trump.equals("s"))
+            r.suit = "c";
+        else if(trump.equals("c"))
+            r.suit = "c";
+        else if(trump.equals("d"))
+            r.suit = "h";
+        else if(trump.equals("h"))
+            r.suit = "d";
+        else
+            throw new RuntimeException();
+        return r;
+    }
+    private boolean hasSuit(ArrayList<Card> cards, Card same) {
+        for(Card card : cards) {
+            if(sameSuit(card, same))
+                return true;
+        }
+        return false;
+    }
+    private boolean tableFull() {
+        return (alone && onTable.size() == 3) || onTable.size() == 4;
+    }
+    
+    private int winTable() {
+        int lead = next(playerTurn);
+        int idx=0;
+        for(int i=1; i < onTable.size(); ++i) {
+            Card top = onTable.get(idx);
+            Card next = onTable.get(i);
+            if(cardLess(top, next)) {
+                idx = i;
+            }
+        }
+        return (idx + lead) % players.size();
+    }
+    
+    private void addTrick(int v) {
+        Player a = players.get(playerOrder.get(v)), b = players.get(playerOrder.get(partner(v)));
+        a.addTrick();
+        b.addTrick();
     }
     
     private Map<String, Action> actionMap = new HashMap<String, Action>() {{
@@ -154,6 +240,7 @@ public class Game {
                     setPhaseAll("bidding");
                     playerTurn = next(dealer);
                     onTable.clear();
+                    alone = false;
                     return "true";
                 }
                 return "false";
@@ -162,15 +249,27 @@ public class Game {
         put("play", new Action() {
             public String go(String username, String data) {
                 Player p = players.get(username);
-                if(p.getPhase().equals("tricks")) {
+                if(p.getPhase().equals("tricks") && playerOrder.indexOf(username) == playerTurn) {
                     Card card = Card.fromString(data);
                     if(card == null)
                         return "invalid data";
-                    if(p.hasCard(card)) {
-                        onTable.add(p.playCard(card));
-                        if(onTable.size() == players.size()) {
-                            //TODO: game logic
+                    if(p.hasCard(card) && (onTable.isEmpty() || tableFull() ||
+                            sameSuit(card, onTable.get(0)) ||
+                            !hasSuit(p.getCards(), onTable.get(0)))) {
+                        if(tableFull())
+                            onTable.clear();
+                        onTable.add(p.removeCard(card));
+                        if(tableFull()) {
+                            int winner = winTable();
+                            addTrick(winner);
+                            if(p.cardCount() == 0) {
+                                //TODO: update scores, change phase
+                            }
+                            playerTurn = winner;
+                        } else {
+                            playerTurn = next(playerTurn);
                         }
+                        return "true";
                     }
                 }
                 return "false";
@@ -180,15 +279,33 @@ public class Game {
             public String go(String username, String data) {
                 Player p = players.get(username);
                 if(p.getPhase().equals("bidding") && playerTurn == playerOrder.indexOf(username)) {
+                    StringTokenizer tokenizer = new StringTokenizer(data, ":");
+                    int cnt=0;
+                    String suit=null, alonestr=null;
+                    while(tokenizer.hasMoreTokens() && cnt < 2) {
+                        String x = tokenizer.nextToken();
+                        if(cnt==0)
+                            suit = x;
+                        else if(cnt==1)
+                            alonestr = x;
+                        ++cnt;
+                    }
+                    if(alonestr != null && !alonestr.equals("alone"))
+                        return "invalid data";
                     if(trumpCard == null) {
-                        if(!Arrays.asList(suits).contains(data))
+                        if(!Arrays.asList(suits).contains(suit))
                             return "invalid data";
                         trump = data;
+                        setPhaseAll("tricks");
                     } else {
                         trump = trumpCard.suit;
+                        players.get(playerOrder.get(dealer)).addCard(trumpCard);
+                        trumpCard = null;
+                        setPhaseAll("discard");
                     }
+                    alone = alonestr != null;
+                    bidWinner = playerTurn;
                     playerTurn = next(dealer);
-                    setPhaseAll("tricks");
                     return "true";
                 }
                 return "false";
@@ -233,6 +350,22 @@ public class Game {
                     if(data == null || data.equals("") || 
                             (!data.equals(username) && players.containsKey(data))) {
                         p.setTeammate(data == null ? "" : data);
+                        return "true";
+                    }
+                }
+                return "false";
+            }
+        });
+        put("discard", new Action() {
+            public String go(String username, String data) {
+                Player p = players.get(username);
+                if(p.getPhase().equals("discard")) {
+                    if(playerOrder.indexOf(username) == dealer) {
+                        Card card = Card.fromString(data);
+                        if(card == null)
+                            return "invalid data";
+                        p.removeCard(card);
+                        setPhaseAll("tricks");
                         return "true";
                     }
                 }
