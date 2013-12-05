@@ -31,7 +31,7 @@ function Card(s, t) {
     this.type = typeof t === 'undefined' ? '' : t
     
     this.toString = function() {
-        return this.isReal() ? this.type + this.suit : 'back'
+        return this.isReal() ? this.type.toString() + this.suit.toString() : 'back'
     }
     this.isReal = function() {
         return this.type !== '' && this.type !== ''
@@ -180,7 +180,7 @@ function doaction(action, actiondata) {
 gameobj = null
 function update() {
     ajaxupdategame(function(obj) {
-        updatehtml(gameobj, obj)
+        updatehtml(gameobj, obj) // might need to clone the gameobj for this to work right
         gameobj = obj
     })
 }
