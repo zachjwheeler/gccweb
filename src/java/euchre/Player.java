@@ -32,6 +32,10 @@ public class Player {
     public void setTeammate(String teammate) {
         this.teammate = teammate;
     }
+    
+    public void addCard(Card card) {
+        cards.add(card);
+    }
 
     public ArrayList<Card> getCards() {
         return cards;
@@ -47,5 +51,10 @@ public class Player {
     
     public String getPassword() {
         return password;
+    }
+    
+    public void clear() {
+        cards.clear();
+        ourTricks = 0;
     }
 }

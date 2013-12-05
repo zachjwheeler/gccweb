@@ -16,6 +16,7 @@ public class Game {
     private int bidWinner;
     private Card trumpCard;
     private Card[] deck;
+    private int deckposn;
     
     public Game() {
         players = new HashMap<String, Player>();
@@ -24,7 +25,7 @@ public class Game {
         clearVars();
         deck = new Card[52];
         String[] suits = new String[]{"c","d","h","s"};
-        String[] types = new String[]{"a","k","q","j","10","9","8","7","6","5","4","3","2"};
+        String[] types = new String[]{"a","k","q","j","10","9"};
         int idx=0;
         for(String suit : suits) {
             for(String type : types) {
@@ -37,9 +38,11 @@ public class Game {
         playerTurn = dealer = bidWinner = -1;
         trump = "";
         trumpCard = null;
+        deckposn=0;
     }
     
     public void shuffle() {
+        deckposn=0;
         Collections.shuffle(Arrays.asList(deck));
     }
     
@@ -113,41 +116,65 @@ public class Game {
         if(a == null)
             return "invalid";
         else
-            return a.go(this, username, actiondata) ? "true" : "false";
+            return a.go(username, actiondata) ? "true" : "false";
+    }
+    
+    private Card draw() {
+        return deck[deckposn++];
     }
     
     private interface Action {
-        public boolean go(Game game, String username, String data);
+        public boolean go(String username, String data);
+    }
+    
+    private void setPhaseAll(String phase) {
+        for(Player pp : players.values())
+            pp.setPhase(phase);
     }
     
     private Map<String, Action> actionMap = new HashMap<String, Action>() {{
         put("deal", new Action() {
-            public boolean go(Game game, String username, String data) {
+            public boolean go(String username, String data) {
+                Player p = players.get(username);
+                if(p.getPhase().equals("preround") && dealer == playerOrder.indexOf(username)) {
+                    shuffle();
+                    for(Player pp : players.values())
+                        pp.clear();
+                    for(int i=0; i<5; ++i) {
+                        for(String pu : playerOrder) {
+                            Player pp = players.get(pu);
+                            pp.addCard(draw());
+                        }
+                    }
+                    trumpCard = draw();
+                    setPhaseAll("bidding");
+                    return true;
+                }
                 return false;
             }
         });
         put("play", new Action() {
-            public boolean go(Game game, String username, String data) {
+            public boolean go(String username, String data) {
                 return false;
             }
         });
         put("declare trump", new Action() {
-            public boolean go(Game game, String username, String data) {
+            public boolean go(String username, String data) {
                 return false;
             }
         });
         put("pass", new Action() {
-            public boolean go(Game game, String username, String data) {
+            public boolean go(String username, String data) {
                 return false;
             }
         });
         put("begin", new Action() {
-            public boolean go(Game game, String username, String data) {
+            public boolean go(String username, String data) {
                 return false;
             }
         });
         put("request teammate", new Action() {
-            public boolean go(Game game, String username, String data) {
+            public boolean go(String username, String data) {
                 return false;
             }
         });
