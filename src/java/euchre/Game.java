@@ -17,6 +17,8 @@ public class Game {
     private Card trumpCard;
     private Card[] deck;
     private int deckposn;
+    private final String[] suits = new String[]{"c","d","h","s"};
+    private final String[] types = new String[]{"a","k","q","j","10","9"};
     
     public Game() {
         players = new HashMap<String, Player>();
@@ -24,8 +26,6 @@ public class Game {
         onTable = new ArrayList<Card>();
         clearVars();
         deck = new Card[52];
-        String[] suits = new String[]{"c","d","h","s"};
-        String[] types = new String[]{"a","k","q","j","10","9"};
         int idx=0;
         for(String suit : suits) {
             for(String type : types) {
@@ -114,9 +114,9 @@ public class Game {
         
         Action a = actionMap.get(action);
         if(a == null)
-            return "invalid";
+            return "invalid action";
         else
-            return a.go(username, actiondata) ? "true" : "false";
+            return a.go(username, actiondata);
     }
     
     private Card draw() {
@@ -124,7 +124,7 @@ public class Game {
     }
     
     private interface Action {
-        public boolean go(String username, String data);
+        public String go(String username, String data);
     }
     
     private void setPhaseAll(String phase) {
@@ -137,7 +137,7 @@ public class Game {
     
     private Map<String, Action> actionMap = new HashMap<String, Action>() {{
         put("deal", new Action() {
-            public boolean go(String username, String data) {
+            public String go(String username, String data) {
                 Player p = players.get(username);
                 if(p.getPhase().equals("preround") && dealer == playerOrder.indexOf(username)) {
                     shuffle();
@@ -152,34 +152,37 @@ public class Game {
                     trumpCard = draw();
                     setPhaseAll("bidding");
                     playerTurn = next(dealer);
-                    return true;
+                    return "true";
                 }
-                return false;
+                return "false";
             }
         });
         put("play", new Action() {
-            public boolean go(String username, String data) {
-                return false;
+            public String go(String username, String data) {
+                Player p = players.get(username);
+                return "false";
             }
         });
         put("declare trump", new Action() {
-            public boolean go(String username, String data) {
+            public String go(String username, String data) {
                 Player p = players.get(username);
                 if(p.getPhase().equals("bidding") && playerTurn == playerOrder.indexOf(username)) {
                     if(trumpCard == null) {
+                        if(!Arrays.asList(suits).contains(data))
+                            return "invalid data";
                         trump = data;
                     } else {
                         trump = trumpCard.suit;
                     }
                     playerTurn = next(dealer);
                     setPhaseAll("tricks");
-                    return true;
+                    return "true";
                 }
-                return false;
+                return "false";
             }
         });
         put("pass", new Action() {
-            public boolean go(String username, String data) {
+            public String go(String username, String data) {
                 Player p = players.get(username);
                 // can't pass if it's the second round of bidding & you're the dealer
                 if(p.getPhase().equals("bidding") && playerTurn == playerOrder.indexOf(username) &&
@@ -187,19 +190,37 @@ public class Game {
                     if(playerTurn == dealer)
                         trumpCard = null;
                     playerTurn = next(playerTurn);
-                    return true;
+                    return "true";
                 }
-                return false;
+                return "false";
             }
         });
         put("begin", new Action() {
-            public boolean go(String username, String data) {
-                return false;
+            public String go(String username, String data) {
+                Player p = players.get(username);
+                if(p.getPhase().equals("pregame")) {
+                    p.setPhase("ready");
+                    boolean move=true;
+                    for(Player pp : players.values())
+                        if(!pp.getPhase().equals("ready"))
+                            move=false;
+                    if(move)
+                        setPhaseAll("preround");
+                    return "true";
+                }
+                return "false";
             }
         });
         put("request teammate", new Action() {
-            public boolean go(String username, String data) {
-                return false;
+            public String go(String username, String data) {
+                Player p = players.get(username);
+                if(p.getPhase().equals("pregame")) {
+                    if(data != null && !data.equals("") && !players.containsKey(data))
+                        return "invalid data";
+                    p.setTeammate(data == null ? "" : data);
+                    return "true";
+                }
+                return "false";
             }
         });
     }};

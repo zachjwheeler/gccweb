@@ -12,7 +12,7 @@ function Game() {
     this.ourtricks=0
     this.theirtricks=0
     this.trumpcard = new Card()
-    this.phase = 'pregame'   // options: 'pregame', 'ready', 'preround', 'bidding', 'tricks'
+    this.phase = 'pregame'   // options: 'pregame', 'ready', 'preround', 'bidding', 'tricks', 'end'
     this.teammate = ''       // the requested or present teammate's username
     
     this.partner = function(idx) {
@@ -115,10 +115,11 @@ function ajaxget(resource, callback) {
     }
 }
 
-/// Response will be one of "true", "false", "invalid", and "crash".
+/// Response will be one of "true", "false", "invalid action", "invalid data", and "crash".
 ///   "true": the action was completed successfully.
 ///   "false": the action could not be completed, e.g. not your turn.
-///   "invalid": there is no action called by the given name.
+///   "invalid action": there is no action called by the given name.
+///   "invalid data": ...
 ///   "crash": there's a bug server-side
 /// If you get "false" or "invalid", I would expect that either there's a bug
 //   or the user is trying to hack the system.
