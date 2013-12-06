@@ -91,7 +91,7 @@ public class Game {
         GameBean bean = new GameBean();
         int me = playerOrder.indexOf(username);
         ArrayList<String> p = (ArrayList<String>)playerOrder.clone();
-        Collections.rotate(p, me);
+        Collections.rotate(p, -me);
         bean.setPlayers(p);
         bean.setPlayerTurn(makeRelative(playerTurn, me));
         bean.setDealer(makeRelative(dealer, me));
