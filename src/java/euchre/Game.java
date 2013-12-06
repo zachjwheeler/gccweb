@@ -392,6 +392,10 @@ public class Game {
                                         Collections.swap(playerOrder, to[i], next(to[i]));
                                 }
                             }
+                            for(int i=0; i < playerOrder.size(); ++i) {
+                                Player pp = players.get(playerOrder.get(i));
+                                pp.setTeammate(playerOrder.get(partner(i)));
+                            }
                         }
                     }
                     return "true";
