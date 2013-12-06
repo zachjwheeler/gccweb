@@ -20,13 +20,10 @@
                 return '<img class="card" src="PlayingCards/' + filename + '.png" alt="' + filename + ' "/>'
             }
             
-            function displaycards(top, cardlist, onedown) {
+            function displaycards(top, cardlist) {
                 top.innerHTML = ''
                 for(var i=0; i < cardlist.length; ++i) {
                     top.innerHTML += getimghtml(cardlist[i].type + cardlist[i].suit)
-                }
-                if(onedown) {
-                    top.innerHTML += getimghtml('back')
                 }
             }
             
@@ -40,6 +37,18 @@
                 function diff(v) {
                     return oldgame === null || oldgame[v].toString() !== game[v].toString()
                 }
+                function pregame() {
+                    return game.phase === 'pregame' || game.phase === 'ready'
+                }
+                
+                if(diff('phase')) {
+                    oldgame = null
+                    document.getElementById('pregame').style.display = pregame() ? 'inline' : 'none'
+                    document.getElementById('table').style.display = !pregame() ? 'inline' : 'none'
+                    
+                    document.getElementById('readybutton').style.display = game.phase === 'pregame' ? 'inline' : 'none'
+                    document.getElementById('readytext').style.display = game.phase === 'ready' ? 'inline' : 'none'
+                }
                 
                 if(diff('trump')) {
                     
@@ -47,6 +56,25 @@
                 if(diff('players')) {
                     if(oldgame === null || oldgame.players.length !== game.players.length)
                         document.getElementById('playercount').childNodes[0].data = game.players.length
+                }
+                if(diff('players') || diff('teammate')) {
+                    var top = document.getElementById('pregame-playerlist')
+                    var str = ''
+                    if(game.players.length > 1)
+                        str += '<div>Other Players:</div><ul>'
+                    for(var i=1; i < game.players.length; ++i) {
+                        var color = game.teammate === game.players[i] ? 'color:green;' : ''
+                        var cursor = game.phase === 'pregame' ? 'cursor:pointer;' : ''
+                        str += '<li class="teammate-select" style="' + color + cursor +
+                                '" onclick="setTeammate(\'' + game.players[i] + '\');">' + 
+                                game.players[i] + '</li>'
+                    }
+                    if(game.players.length > 1)
+                        str += '</ul>'
+                    top.innerHTML = str
+                    document.getElementById('pregame-no-teammate').style.cursor = game.phase === 'pregame' ? 'pointer' : 'auto'
+                    document.getElementById('pregame-no-teammate').style.color = 
+                            (game.teammate === null || game.teammate === '') ? 'green' : ''
                 }
                 if(diff('cards')) {
                     
@@ -78,17 +106,36 @@
                 if(diff('trumpcard')) {
                     
                 }
-                if(diff('phase')) {
-                    
-                }
                 if(diff('teammate')) {
                     
                 }
             }
+            
+            function setTeammate(teammate) {
+                if(gameobj.phase === 'pregame')
+                    doaction("request teammate", teammate)
+            }
         </script>
+        <style type='text/css'>
+            .teammate-select {
+                text-decoration:underline;
+                color:blue;
+            }
+        </style>
     </head>
     <body onload='init()'>
         <p># players: <span id='playercount'>0</span></p>
         <p>Player: <span id='username'><%= session.getAttribute("username") %></span></p>
+        <span id='pregame'>
+            <span id='pregame-no-teammate' class="teammate-select" onclick='setTeammate("")'>No Teammate Request</span>
+            <div id='pregame-playerlist'>
+                
+            </div>
+            <button id='readybutton' onclick='doaction("begin")'>Ready!</button>
+            <div id='readytext' style='display:none;'>Waiting for other players...</div>
+        </span>
+        <span id='table' style='display:none;'>
+            Table
+        </span>
     </body>
 </html>

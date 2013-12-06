@@ -47,7 +47,7 @@ function ajaxparseobj(doc) {
     game.ontable = ajaxgetcards(doc.getElementsByTagName('ontable').item(0))
     var playerlist = doc.getElementsByTagName('player')
     for(var i=0; i < playerlist.length; ++i) {
-        game.players.push(playerlist.item(0).childNodes[0].data)
+        game.players.push(playerlist.item(i).childNodes[0].data)
     }
     game.trumpcard = ajaxgetcards(doc.getElementsByTagName('trumpcard').item(0))
     if(game.trumpcard.length > 0)
@@ -158,7 +158,7 @@ function ajaxaction(action, actiondata, callback) {
  * 'pass': used during bidding rounds
  * 'begin': player considers himself ready to begin the game, valid during 'pregame' phase
  * 'request teammate', teammate: valid during 'pregame' phase, sending this multiple times
- *                               is supported
+ *                               is supported. If teammate is null or empty, resets
  * 'discard', card: discard the card given by 'card', for use by dealer when he 
  *                  is told to "pick it up" during the first bidding round
  *                  (ie after someone sends 'declare trump' during first bidding round)
