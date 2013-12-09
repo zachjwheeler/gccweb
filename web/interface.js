@@ -34,7 +34,7 @@ function Card(s, t) {
         return this.isReal() ? this.type.toString() + this.suit.toString() : 'back'
     }
     this.isReal = function() {
-        return this.type !== '' && this.type !== ''
+        return this.type !== '' && this.suit !== ''
     }
 }
 
