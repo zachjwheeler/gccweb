@@ -24,6 +24,10 @@ public class Player {
     public void setPhase(String phase) {
         this.phase = phase;
     }
+    
+    public void setScore(int s) {
+        ourScore = s;
+    }
 
     public String getTeammate() {
         return teammate;

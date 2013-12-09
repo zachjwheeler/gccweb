@@ -21,6 +21,7 @@ public class Game {
     private long gameEnded;
     private Card[] deck;
     private int deckposn;
+    public static final boolean debug = true;
     
     public final static String[] suits = new String[]{"c","d","h","s"};
     public final static String[] types = new String[]{"a","k","q","j","10","9"};
@@ -46,6 +47,21 @@ public class Game {
     
     public boolean shouldBoot() {
         return gameEnded != -1 && System.currentTimeMillis() - gameEnded > 10*1000;
+    }
+    
+    private void endGame() {
+        setPhaseAll("end");
+        gameEnded = System.currentTimeMillis();
+    }
+    
+    public boolean playerQuit(String username) {
+        if(!players.containsKey(username)) return false;
+        int p = playerOrder.indexOf(username);
+        players.get(playerOrder.get(p)).setScore(-1);
+        players.get(playerOrder.get(nextPlayer(p))).setScore(20);
+        players.get(playerOrder.get(nextPlayer(partner(p)))).setScore(20);
+        endGame();
+        return true;
     }
     
     private void clearVars() {
@@ -287,8 +303,7 @@ public class Game {
                                 
                                 if(players.get(playerOrder.get(roundwinner)).getOurScore() >= 10 ||
                                         players.get(playerOrder.get(nextPlayer(roundwinner))).getOurScore() >= 10) {
-                                    setPhaseAll("end");
-                                    gameEnded = System.currentTimeMillis();
+                                    endGame();
                                 } else {
                                     setPhaseAll("preround");
                                     dealer = nextPlayer(dealer);
@@ -366,7 +381,10 @@ public class Game {
                                 move=false;
                         if(move) {
                             setPhaseAll("preround");
-                            dealer = (int)(Math.random()*playerOrder.size());
+                            if(!debug)
+                                dealer = (int)(Math.random()*playerOrder.size());
+                            else
+                                dealer = 0;
                             alone = false;
                             playerTurn=nextPlayer(dealer);
                             

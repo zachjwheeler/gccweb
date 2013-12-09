@@ -77,7 +77,7 @@
                             (game.teammate === null || game.teammate === '') ? 'green' : ''
                 }
                 if(diff('cards')) {
-                    
+                    displaycards(document.getElementById('yourhand'),game.cards);
                 }
                 if(diff('ontable')) {
                     
@@ -124,6 +124,10 @@
         </style>
     </head>
     <body onload='init()'>
+        <form method='POST' action='ctrl'>
+            <input type='hidden' name='quit' value='quit'/>
+            <input type='submit' value='Quit'/>
+        </form>
         <p># players: <span id='playercount'>0</span></p>
         <p>Player: <span id='username'><%= session.getAttribute("username") %></span></p>
         <span id='pregame'>
@@ -136,6 +140,14 @@
         </span>
         <span id='table' style='display:none;'>
             Table
+            <div id = 'partnerhand'>test</div>
+            1
+            <div id = 'lefthand'></div>
+            2
+            <div id = 'righthand'></div>
+            3
+            <div id = 'yourhand'></div>
+            4
         </span>
     </body>
 </html>

@@ -20,7 +20,6 @@ import javax.servlet.http.HttpSession;
 public class Controller extends HttpServlet {
     private Game game;
     private Set<String> bootList;
-    private static final boolean debug = true;
     
     public Controller() {
         game = new Game();
@@ -97,6 +96,10 @@ public class Controller extends HttpServlet {
             } finally {            
                 out.close();
             }
+        } else if(post && request.getParameter("quit") != null) {
+            game.playerQuit(username);
+            session.invalidate();
+            response.sendRedirect("index.jsp");
         } else {
             if(post && (username == null || username.equals(""))) {
                 username = request.getParameter("username");
@@ -106,7 +109,7 @@ public class Controller extends HttpServlet {
                         session.setAttribute("invalidUsername", username);
                         username = null;
                     } else {
-                        if(debug && !game.full()) {
+                        if(Game.debug && !game.full()) {
                             game.tryAddPlayer("DebugLeft", "debug");
                             game.tryAddPlayer("DebugPartner", "debug");
                             game.tryAddPlayer("DebugRight", "debug");
