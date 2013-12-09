@@ -81,6 +81,8 @@ public class Controller extends HttpServlet {
                             out.println("<theirscore>" + bean.getTheirScore() + "</theirscore>");
                             out.println("<ourtricks>" + bean.getOurTricks() + "</ourtricks>");
                             out.println("<theirtricks>" + bean.getTheirTricks() + "</theirtricks>");
+                        } else {
+                            session.invalidate();
                         }
                         out.println("</game>");
                     } else {
