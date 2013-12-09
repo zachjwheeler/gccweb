@@ -361,8 +361,10 @@ public class Game {
                 // can't pass if it's the second round of bidding & you're the dealer
                 if(p.getPhase().equals("bidding") && playerTurn == playerOrder.indexOf(username) &&
                         (trumpCard != null || playerTurn != dealer)) {
-                    if(playerTurn == dealer)
+                    if(playerTurn == dealer) {
+                        trump = trumpCard.suit;
                         trumpCard = null;
+                    }
                     playerTurn = nextTurn(playerTurn);
                     return "true";
                 }
