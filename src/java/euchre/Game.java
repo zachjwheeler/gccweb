@@ -31,7 +31,7 @@ public class Game {
         playerOrder = new ArrayList<String>();
         onTable = new ArrayList<Card>();
         clearVars();
-        deck = new Card[52];
+        deck = new Card[suits.length * types.length];
         int idx=0;
         for(String suit : suits) {
             for(String type : types) {
