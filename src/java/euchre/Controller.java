@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 public class Controller extends HttpServlet {
     private Game game;
     private Set<String> bootList;
+    private static final boolean debug = true;
     
     public Controller() {
         game = new Game();
@@ -105,6 +106,16 @@ public class Controller extends HttpServlet {
                         session.setAttribute("invalidUsername", username);
                         username = null;
                     } else {
+                        if(debug && !game.full()) {
+                            game.tryAddPlayer("DebugLeft", "debug");
+                            game.tryAddPlayer("DebugPartner", "debug");
+                            game.tryAddPlayer("DebugRight", "debug");
+                            game.tryAction("DebugLeft", "request teammate", "DebugRight");
+                            game.tryAction("DebugRight", "request teammate", "DebugLeft");
+                            game.tryAction("DebugLeft", "begin", "");
+                            game.tryAction("DebugPartner", "begin", "");
+                            game.tryAction("DebugRight", "begin", "");
+                        }
                         session.setAttribute("username", username);
                     }
                 }

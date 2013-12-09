@@ -67,7 +67,7 @@ public class Game {
         return "";
     }
     
-    public boolean inProgress() {
+    public boolean full() {
         return players.size() == 4;
     }
     
