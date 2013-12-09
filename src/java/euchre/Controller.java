@@ -108,7 +108,8 @@ public class Controller extends HttpServlet {
                     if(!game.tryAddPlayer(username, password)) {
                         if(game.full())
                             session.setAttribute("full", "full");
-                        session.setAttribute("invalidUsername", username);
+                        if(game.getPlayerUsernames().contains(username))
+                            session.setAttribute("invalidUsername", username);
                         username = null;
                     } else {
                         if(Game.debug && !game.full()) {
