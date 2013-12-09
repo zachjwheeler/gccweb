@@ -337,7 +337,7 @@ public class Game {
                     if(alonestr != null && !alonestr.equals("alone"))
                         return "invalid data";
                     if(trumpCard == null) {
-                        if(!Arrays.asList(suits).contains(suit))
+                        if(!Arrays.asList(suits).contains(suit) || trump.equals(suit))
                             return "invalid data";
                         trump = data;
                         setPhaseAll("tricks");
