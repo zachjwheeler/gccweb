@@ -134,12 +134,15 @@ public class Game {
         for(Player pp : players.values())
             pp.setPhase(phase);
     }
-    private int next(int v) {
-        v = (v+1)%players.size();
+    private int nextTurn(int v) {
+        v = nextPlayer(v);
         if(players.get(playerOrder.get(v)).getPhase().equals("tricks") && 
                 alone && partner(bidWinner) == v)
-            return (v+1)%players.size();
+            return nextPlayer(v);
         return v;
+    }
+    private int nextPlayer(int v) {
+        return (v+1)%playerOrder.size();
     }
     private int partner(int v) {
         return (v+2)%players.size();
@@ -245,7 +248,7 @@ public class Game {
                     }
                     trumpCard = draw();
                     setPhaseAll("bidding");
-                    playerTurn = next(dealer);
+                    playerTurn = nextPlayer(dealer);
                     onTable.clear();
                     alone = false;
                     return "true";
@@ -272,24 +275,28 @@ public class Game {
                             if(p.cardCount() == 0) {
                                 int roundwinner = winner;
                                 if(players.get(playerOrder.get(roundwinner)).getOurTricks() <
-                                        players.get(playerOrder.get(next(roundwinner))).getOurTricks()) {
-                                    roundwinner = next(roundwinner);
+                                        players.get(playerOrder.get(nextPlayer(roundwinner))).getOurTricks()) {
+                                    roundwinner = nextPlayer(roundwinner);
                                 }
-                                //heh heh, gotta love ternary operator
-                                addScore(roundwinner, sameTeam(bidWinner, roundwinner) ? alone ? 4 : 1 : 2);
+                                int score=1;
+                                if(!sameTeam(bidWinner, roundwinner))
+                                    score = 2;
+                                else if(players.get(playerOrder.get(roundwinner)).getOurTricks() == 5)
+                                    score = alone ? 4 : 2;
+                                addScore(roundwinner, score);
                                 
                                 if(players.get(playerOrder.get(roundwinner)).getOurScore() >= 10 ||
-                                        players.get(playerOrder.get(next(roundwinner))).getOurScore() >= 10) {
+                                        players.get(playerOrder.get(nextPlayer(roundwinner))).getOurScore() >= 10) {
                                     setPhaseAll("end");
                                     gameEnded = System.currentTimeMillis();
                                 } else {
                                     setPhaseAll("preround");
-                                    dealer = next(dealer);
+                                    dealer = nextPlayer(dealer);
                                 }
                             }
                             playerTurn = winner;
                         } else {
-                            playerTurn = next(playerTurn);
+                            playerTurn = nextTurn(playerTurn);
                         }
                         return "true";
                     }
@@ -327,7 +334,7 @@ public class Game {
                     }
                     alone = alonestr != null;
                     bidWinner = playerTurn;
-                    playerTurn = next(dealer);
+                    playerTurn = nextPlayer(dealer);
                     return "true";
                 }
                 return "false";
@@ -341,7 +348,7 @@ public class Game {
                         (trumpCard != null || playerTurn != dealer)) {
                     if(playerTurn == dealer)
                         trumpCard = null;
-                    playerTurn = next(playerTurn);
+                    playerTurn = nextTurn(playerTurn);
                     return "true";
                 }
                 return "false";
@@ -361,7 +368,7 @@ public class Game {
                             setPhaseAll("preround");
                             dealer = (int)(Math.random()*playerOrder.size());
                             alone = false;
-                            playerTurn=next(dealer);
+                            playerTurn=nextPlayer(dealer);
                             
                             // Assign teammates: satisfy any mutual preferences,
                             //  and if there are none, satisfy the first player
@@ -381,7 +388,7 @@ public class Game {
                                     if(to[i] == j && to[j] == i) {
                                         done=true;
                                         if(((i+j)&1) == 1)
-                                            Collections.swap(playerOrder, j, next(j));
+                                            Collections.swap(playerOrder, j, nextPlayer(j));
                                     }
                                 }
                             }
@@ -389,7 +396,7 @@ public class Game {
                                 if(to[i] != -1) {
                                     done=true;
                                     if(((i+to[i])&1) == 1)
-                                        Collections.swap(playerOrder, to[i], next(to[i]));
+                                        Collections.swap(playerOrder, to[i], nextPlayer(to[i]));
                                 }
                             }
                             for(int i=0; i < playerOrder.size(); ++i) {
