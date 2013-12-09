@@ -125,6 +125,7 @@ public class Controller extends HttpServlet {
                             game.tryAction("DebugRight", "begin", "");
                         }
                         session.setAttribute("username", username);
+                        bootList.remove(username);
                     }
                 }
             }
