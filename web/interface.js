@@ -40,7 +40,12 @@ function Card(s, t) {
 
 function ajaxparseobj(doc) {
     var game = new Game()
-    game.trump = doc.getElementsByTagName('trump').item(0).childNodes[0].data
+    game.trump = doc.getElementsByTagName('trump').item(0)
+    if(game.trump === null) {
+        window.location = 'index.jsp'
+        return game
+    } else
+        game.trump = game.trump.childNodes[0].data
     if(game.trump === 'none')
         game.trump = ''
     game.cards = ajaxgetcards(doc.getElementsByTagName('cards').item(0))

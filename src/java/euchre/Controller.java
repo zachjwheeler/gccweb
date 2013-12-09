@@ -106,6 +106,8 @@ public class Controller extends HttpServlet {
                 String password = request.getParameter("password");
                 if(username != null && !username.equals("")) {
                     if(!game.tryAddPlayer(username, password)) {
+                        if(game.full())
+                            session.setAttribute("full", "full");
                         session.setAttribute("invalidUsername", username);
                         username = null;
                     } else {

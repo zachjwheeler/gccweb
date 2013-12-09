@@ -15,8 +15,12 @@
         <h1>Let's play Euchre!</h1>
         <%
         if(session != null && session.getAttribute("invalidUsername") != null) {
-            out.println("<p style='color:red;'>Someone already chose the name `" + 
-                    session.getAttribute("invalidUsername") + "'. Try another.");
+            out.println("<p style='color:red;'>The name `" + 
+                    session.getAttribute("invalidUsername") + "' is "
+                    + "in use, but that's the wrong user code.");
+        }
+        if(session != null && session.getAttribute("full") != null) {
+            out.println("<p style='color:red;'>The game is already full.");
         }
         %>
         <form method="POST" action="ctrl">
