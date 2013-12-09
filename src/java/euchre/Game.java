@@ -337,8 +337,10 @@ public class Game {
                     if(alonestr != null && !alonestr.equals("alone"))
                         return "invalid data";
                     if(trumpCard == null) {
-                        if(!Arrays.asList(suits).contains(suit) || trump.equals(suit))
+                        if(!Arrays.asList(suits).contains(suit))
                             return "invalid data";
+                        if(trump.equals(suit))
+                            return "false";
                         trump = data;
                         setPhaseAll("tricks");
                     } else {
