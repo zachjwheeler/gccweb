@@ -29,7 +29,7 @@
                     if(gameobj.phase === 'tricks')
                         doaction('play', filename)
                     else if(gameobj.phase === 'discard' && gameobj.dealer === 0)
-                        doaction('discard', filname)
+                        doaction('discard', filename)
                 }
             }
             
@@ -100,11 +100,6 @@
                     } else {
                         for(var i=0; i < 4; ++i)
                         {
-                            if(game.playerturn === i)
-                            {
-                                document.getElementById('otherPlayerName'+i).style.color = 'red'
-                                document.getElementById('otherPlayerName'+i).style.fontWeight = 'bold'
-                            }
                             if(i !== 0)
                                 document.getElementById('otherPlayerName'+i).innerHTML = game.players[i]
                         }
@@ -118,6 +113,11 @@
                     
                 }
                 if(diff('playerturn')) {
+                    for(var i=0; i < 4; ++i)
+                    {
+                        document.getElementById('otherPlayerName'+i).style.color = game.playerturn === i ? 'red' : ''
+                        document.getElementById('otherPlayerName'+i).style.fontWeight = game.playerturn === i ? 'bold' : ''
+                    }
                     if(game.phase === 'bidding')
                     {
                         var tempCards = new Array()
@@ -149,27 +149,29 @@
                     {
                         var startPlayer = (game.playerturn - game.ontable.length + 4) % 4;
                         var tempCards = new Array();
-                        for(var i = 0; i < 5 - game.ourtricks - game.theirtricks - 1; ++i)
+                        var inert = game.ontable.length === 4 ? 1 : 0
+                        for(var i = 0; i < 5 - game.ourtricks - game.theirtricks - 1 + inert; ++i)
                             tempCards.push(new Card());
                         for(var i = 0; i < 4; ++i)
                         {
                             var currentPlayer = (startPlayer+i)%4;
-                            if(currentPlayer === 0)
-                                continue;
                             if(i === game.ontable.length)
                                 tempCards.push(new Card());
-                            displaycards(document.getElementById('otherPlayer' + currentPlayer),tempCards)
+                            if(currentPlayer !== 0)
+                                displaycards(document.getElementById('otherPlayer' + currentPlayer),tempCards)
                         }
                     }
                     
                     var b = game.phase === 'bidding' && game.trumpcard.isReal() && game.playerturn === 0
                     document.getElementById('trumpbutton').style.display = b ? 'inline' : 'none'
                     document.getElementById('goalonebutton').style.display = b ? 'inline' : 'none'
-                    document.getElementById('passbutton').style.display = game.phase === 'bidding' && game.playerturn === 0 ? 'inline' : 'none'
+                    document.getElementById('passbutton').style.display = 
+                            game.phase === 'bidding' && game.playerturn === 0 && 
+                            (game.dealer !== 0 || game.trumpcard.isReal()) ? 'inline' : 'none'
                     
                     if(game.phase === 'bidding' && game.trumpcard.isReal())
                     {
-                        document.getElementById('middle').style.display = 'inline'
+                        document.getElementById('middle').style.display = 'block'
                         displaycards( document.getElementById('middle'),[game.trumpcard])
                     }
                     else if(game.phase === 'bidding')
@@ -179,7 +181,7 @@
                     }
                     else if(game.phase === 'tricks')
                     {
-                        document.getElementById('middle').style.display = 'inline'
+                        document.getElementById('middle').style.display = 'block'
                         document.getElementById('callTrump').style.display = 'none'
                         displaycards( document.getElementById('middle'),game.ontable)
                     }
@@ -255,20 +257,21 @@
             <div id='readytext' style='display:none;'>Waiting for other players...</div>
         </span>
         <span id='table' style='display:none;'>
-            <p>
-            <div id = 'otherPlayer2' style = 'text-align:center'></div>
             <div style = 'text-align:center'> Partner Hand: <span id='otherPlayerName2'></span></div>
-            </p>
-            <p>
-            <span id = 'otherPlayer1'></span>
-            <span id = 'middle'></span> 
-            <span style = 'float:right' id = 'otherPlayer3'></span>
-            </p>
-            <p>
+            <div id = 'otherPlayer2' style = 'text-align:center'></div>
+            <table style='width:100%;'><tr>
+            <td>
+            <div id = 'otherPlayer1'></div>
+            </td>
+            <td>
+            <span style='text-align:center;' id = 'middle'></span>
+            </td>
+            <td>
+            <div style = 'text-align:right' id = 'otherPlayer3'></div>
+            </td>
+            </tr></table>
             <span> Left Player's Hand: <span id='otherPlayerName1'></span></span>
-            
             <span style = 'float:right'> Right Player's Hand: <span id='otherPlayerName3'></span></span>
-            </p>
             <p>
             <div id = 'yourhand' style = 'text-align:center'></div>
             <div  style = 'text-align:center'> Your Hand: <span id='otherPlayerName0'><%= session.getAttribute("username") %></span></div>

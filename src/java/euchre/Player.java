@@ -76,6 +76,7 @@ public class Player {
     
     public Card removeCard(Card card) {
         int idx = cards.indexOf(card);
+        if(idx == -1) return null;
         Card r = cards.get(idx);
         cards.remove(idx);
         return r;

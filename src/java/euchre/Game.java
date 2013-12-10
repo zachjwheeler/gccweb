@@ -205,7 +205,7 @@ public class Game {
         if(trump.equals("s"))
             r.suit = "c";
         else if(trump.equals("c"))
-            r.suit = "c";
+            r.suit = "s";
         else if(trump.equals("d"))
             r.suit = "h";
         else if(trump.equals("h"))
@@ -226,7 +226,7 @@ public class Game {
     }
     
     private int winTable() {
-        int lead = (playerTurn - onTable.size() + players.size()) % players.size();
+        int lead = (playerTurn - onTable.size() + 1 + players.size()*2) % players.size();
         int idx=0;
         for(int i=1; i < onTable.size(); ++i) {
             Card top = onTable.get(idx);
@@ -288,7 +288,10 @@ public class Game {
                             !hasSuit(p.getCards(), onTable.get(0)))) {
                         if(tableFull())
                             onTable.clear();
-                        onTable.add(p.removeCard(card));
+                        Card tmp = p.removeCard(card);
+                        if(tmp == null)
+                            return "crash";
+                        onTable.add(tmp);
                         if(tableFull()) {
                             int winner = winTable();
                             addTrick(winner);
@@ -311,9 +314,11 @@ public class Game {
                                 } else {
                                     setPhaseAll("preround");
                                     dealer = nextPlayer(dealer);
+                                    playerTurn = dealer;
                                 }
                             }
-                            playerTurn = winner;
+                            if(!p.getPhase().equals("preround"))
+                                playerTurn = winner;
                         } else {
                             playerTurn = nextTurn(playerTurn);
                         }
@@ -347,15 +352,16 @@ public class Game {
                             return "false";
                         trump = suit;
                         setPhaseAll("tricks");
+                        playerTurn = nextPlayer(dealer);
                     } else {
                         trump = trumpCard.suit;
                         players.get(playerOrder.get(dealer)).addCard(trumpCard);
                         trumpCard = null;
                         setPhaseAll("discard");
+                        playerTurn = dealer;
                     }
                     alone = alonestr != null;
                     bidWinner = playerTurn;
-                    playerTurn = nextPlayer(dealer);
                     return "true";
                 }
                 return "false";
@@ -371,7 +377,7 @@ public class Game {
                         trump = trumpCard.suit;
                         trumpCard = null;
                     }
-                    playerTurn = nextTurn(playerTurn);
+                    playerTurn = nextPlayer(playerTurn);
                     return "true";
                 }
                 return "false";
@@ -394,7 +400,7 @@ public class Game {
                             else
                                 dealer = 0;
                             alone = false;
-                            playerTurn=nextPlayer(dealer);
+                            playerTurn=dealer;
                             
                             // Assign teammates: satisfy any mutual preferences,
                             //  and if there are none, satisfy the first player
@@ -457,8 +463,12 @@ public class Game {
                         Card card = Card.fromString(data);
                         if(card == null)
                             return "invalid data";
-                        p.removeCard(card);
+                        if(!p.hasCard(card))
+                            return "false";
+                        if(p.removeCard(card) == null)
+                            return "crash";
                         setPhaseAll("tricks");
+                        playerTurn = nextPlayer(dealer);
                         return "true";
                     }
                 }
