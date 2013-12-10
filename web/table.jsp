@@ -98,8 +98,16 @@
                         document.getElementById('pregame-no-teammate').style.color = 
                                 (game.teammate === null || game.teammate === '') ? 'green' : ''
                     } else {
-                        for(var i=1; i < 4; ++i)
-                            document.getElementById('otherPlayerName'+i).innerHTML = game.players[i]
+                        for(var i=0; i < 4; ++i)
+                        {
+                            if(game.playerturn === i)
+                            {
+                                document.getElementById('otherPlayerName'+i).style.color = 'red'
+                                document.getElementById('otherPlayerName'+i).style.fontWeight = 'bold'
+                            }
+                            if(i !== 0)
+                                document.getElementById('otherPlayerName'+i).innerHTML = game.players[i]
+                        }
                     }
                 }
                 if(diff('cards')) {
@@ -263,7 +271,7 @@
             </p>
             <p>
             <div id = 'yourhand' style = 'text-align:center'></div>
-            <div  style = 'text-align:center'> Your Hand: <span id='username'><%= session.getAttribute("username") %></span></div>
+            <div  style = 'text-align:center'> Your Hand: <span id='otherPlayerName0'><%= session.getAttribute("username") %></span></div>
             </p>
             <p>
             <button id='dealbutton' onclick='doaction("deal")'>Deal</button>
