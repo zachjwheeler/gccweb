@@ -210,16 +210,20 @@
                     
                 }
                 if(diff('ourscore')) {
-                    
+                    document.getElementById('YourScorea').style.display = 'inline'
+                    document.getElementById('YourScoreb').innerHTML = game.ourscore
                 }
                 if(diff('theirscore')) {
-                    
+                    document.getElementById('YourTrickScorea').style.display = 'inline'
+                    document.getElementById('YourTrickScoreb').innerHTML = game.theirscore
                 }
                 if(diff('ourtricks')) {
-                    
+                    document.getElementById('YourTrickScorea').style.display = 'inline'
+                    document.getElementById('YourTrickScoreb').innerHTML = game.ourtricks
                 }
                 if(diff('theirtricks')) {
-                    
+                    document.getElementById('TheirTrickScorea').style.display = 'inline'
+                    document.getElementById('TheirTrickScoreb').innerHTML = game.theirtricks
                 }
                 if(diff('trumpcard')) {
                     if(game.phase === 'bidding' && !game.trumpcard.isReal())
@@ -259,6 +263,12 @@
         </form>
         <p># players: <span id='playercount'>0</span></p>
         <p><span id = 'trumpDispPar' style='display:none;'>Trump: <img id = 'trumpDisp' ></img></span></p>
+        <p>
+        <span id = 'YourTrickScorea' style='display:none;'>Your Trick Score: <span id = 'YourTrickScoreb'></span></span>
+        <span id = 'TheirTrickScorea' style='display:none;'>.     Their Trick Score: <span id = 'TheirTrickScoreb'></span></span>
+        <span id = 'YourScorea' style='display:none;'>.     Your Score: <span id = 'YourScoreb'></span></span>
+        <span id = 'TheirScorea' style='display:none;'>.     Their Score: <span id = 'TheirScoreb'></span></span>
+        </p>
         <span id='pregame'>
             <p>Player: <span id='pregame-username'><%= session.getAttribute("username") %></span></p>
             <span id='pregame-no-teammate' class="teammate-select" onclick='setTeammate("")'>No Teammate Request</span>
