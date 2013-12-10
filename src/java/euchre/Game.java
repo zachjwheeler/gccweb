@@ -98,7 +98,7 @@ public class Game {
     }
     
     private int makeRelative(int v, int me) {
-        return v >= 0 ? (me - v + players.size()) % players.size() : -1;
+        return v >= 0 ? (v - me + players.size()) % players.size() : -1;
     }
     
     public GameBean getBean(String username) {
@@ -341,7 +341,7 @@ public class Game {
                             return "invalid data";
                         if(trump.equals(suit))
                             return "false";
-                        trump = data;
+                        trump = suit;
                         setPhaseAll("tricks");
                     } else {
                         trump = trumpCard.suit;
