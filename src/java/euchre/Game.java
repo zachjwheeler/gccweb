@@ -229,7 +229,7 @@ public class Game {
     }
     
     private int winTable() {
-        int skip = partner(bidWinner);
+        int skip = alone ? partner(bidWinner): -1;
         int eqlen = onTable.size();
         for(int i=0; i < onTable.size(); ++i) {
             if((playerTurn-i+players.size())%players.size() == skip)
@@ -244,7 +244,7 @@ public class Game {
                 idx = i;
             }
         }
-        if(idx >= skip)
+        if(alone && idx >= skip)
             ++idx;
         return (idx + lead) % players.size();
     }
