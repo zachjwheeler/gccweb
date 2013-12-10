@@ -64,6 +64,7 @@
                         document.getElementById('trumpDisp').src = 'PlayingCards/suit_' + game.trump + '.png';
                         document.getElementById('trumpDispPar').style.display = 'inline';
                     }
+                    
                     document.getElementById('dealbutton').style.display = game.phase === 'preround' && game.dealer === 0 ? 'inline' : 'none'
                     
                     document.getElementById('readybutton').style.display = game.phase === 'pregame' ? 'inline' : 'none'
@@ -199,7 +200,11 @@
                     
                 }
                 if(diff('trumpcard')) {
-                    
+                    if(game.phase === 'bidding' && !game.trumpcard.isReal())
+                    {
+                        document.getElementById(game.trump).style.display = 'none'
+                        document.getElementById(game.trump+'_alone').style.display = 'none'
+                    }
                 }
                 if(diff('teammate')) {
                     
@@ -231,7 +236,7 @@
             <input type='submit' value='Debug Stop'/>
         </form>
         <p># players: <span id='playercount'>0</span></p>
-        <p><span id = 'trumpDispPar' style='display:none;'>Trump: <img id = 'trumpDisp' ></img><span></p>
+        <p><span id = 'trumpDispPar' style='display:none;'>Trump: <img id = 'trumpDisp' ></img></span></p>
         <span id='pregame'>
             <p>Player: <span id='pregame-username'><%= session.getAttribute("username") %></span></p>
             <span id='pregame-no-teammate' class="teammate-select" onclick='setTeammate("")'>No Teammate Request</span>
@@ -258,7 +263,7 @@
             </p>
             <p>
             <div id = 'yourhand' style = 'text-align:center'></div>
-            <div  style = 'text-align:center'> Your Hand: <span id='username'><%= session.getAttribute("username") %></div>
+            <div  style = 'text-align:center'> Your Hand: <span id='username'><%= session.getAttribute("username") %></span></div>
             </p>
             <p>
             <button id='dealbutton' onclick='doaction("deal")'>Deal</button>
