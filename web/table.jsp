@@ -78,7 +78,7 @@
                     if(oldgame === null || oldgame.players.length !== game.players.length)
                         document.getElementById('playercount').childNodes[0].data = game.players.length
                 }
-                if(diff('players') || diff('teammate')) {
+                if(diff('players') || diff('teammate') || diff('bidwinner')) {
                     if(pregame()) {
                         var top = document.getElementById('pregame-playerlist')
                         var str = ''
@@ -100,8 +100,9 @@
                     } else {
                         for(var i=0; i < 4; ++i)
                         {
-                            if(i !== 0)
-                                document.getElementById('otherPlayerName'+i).innerHTML = game.players[i]
+                            document.getElementById('otherPlayerName'+i).innerHTML = game.players[i] +
+                                (i == game.bidwinner ? ': BIDWINNER ' : '') +
+                                (i == game.bidwinner && game.alone ? '(alone)' : '')
                         }
                     }
                 }
