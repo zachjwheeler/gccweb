@@ -210,19 +210,19 @@
                     
                 }
                 if(diff('ourscore')) {
-                    document.getElementById('YourScorea').style.display = 'inline'
+                    document.getElementById('YourScorea').style.display = 'block'
                     document.getElementById('YourScoreb').innerHTML = game.ourscore
                 }
                 if(diff('theirscore')) {
-                    document.getElementById('YourTrickScorea').style.display = 'inline'
-                    document.getElementById('YourTrickScoreb').innerHTML = game.theirscore
+                    document.getElementById('TheirScorea').style.display = 'block'
+                    document.getElementById('TheirScoreb').innerHTML = game.theirscore
                 }
                 if(diff('ourtricks')) {
-                    document.getElementById('YourTrickScorea').style.display = 'inline'
+                    document.getElementById('YourTrickScorea').style.display = 'block'
                     document.getElementById('YourTrickScoreb').innerHTML = game.ourtricks
                 }
                 if(diff('theirtricks')) {
-                    document.getElementById('TheirTrickScorea').style.display = 'inline'
+                    document.getElementById('TheirTrickScorea').style.display = 'block'
                     document.getElementById('TheirTrickScoreb').innerHTML = game.theirtricks
                 }
                 if(diff('trumpcard')) {
@@ -264,10 +264,10 @@
         <p># players: <span id='playercount'>0</span></p>
         <p><span id = 'trumpDispPar' style='display:none;'>Trump: <img id = 'trumpDisp' ></img></span></p>
         <p>
-        <span id = 'YourTrickScorea' style='display:none;'>Your Trick Score: <span id = 'YourTrickScoreb'></span></span>
-        <span id = 'TheirTrickScorea' style='display:none;'>.     Their Trick Score: <span id = 'TheirTrickScoreb'></span></span>
-        <span id = 'YourScorea' style='display:none;'>.     Your Score: <span id = 'YourScoreb'></span></span>
-        <span id = 'TheirScorea' style='display:none;'>.     Their Score: <span id = 'TheirScoreb'></span></span>
+        <div id = 'YourTrickScorea' style='display:none;'>Your Trick Score: <span id = 'YourTrickScoreb'></span></div>
+        <div id = 'TheirTrickScorea' style='display:none;'>Their Trick Score: <span id = 'TheirTrickScoreb'></span></div>
+        <div id = 'YourScorea' style='display:none;'>Your Score: <span id = 'YourScoreb'></span></div>
+        <div id = 'TheirScorea' style='display:none;'>Their Score: <span id = 'TheirScoreb'></span></div>
         </p>
         <span id='pregame'>
             <p>Player: <span id='pregame-username'><%= session.getAttribute("username") %></span></p>
