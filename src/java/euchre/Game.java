@@ -157,8 +157,10 @@ public class Game {
     private int nextTurn(int v) {
         v = nextPlayer(v);
         if(players.get(playerOrder.get(v)).getPhase().equals("tricks") && 
-                alone && partner(bidWinner) == v)
-            return nextPlayer(v);
+                alone && partner(bidWinner) == v) {
+            v = nextPlayer(v);
+            return v;
+        }
         return v;
     }
     private int nextPlayer(int v) {
@@ -226,7 +228,13 @@ public class Game {
     }
     
     private int winTable() {
-        int lead = (playerTurn - onTable.size() + 1 + players.size()*2) % players.size();
+        int skip = partner(bidWinner);
+        int eqlen = onTable.size();
+        for(int i=0; i < onTable.size(); ++i) {
+            if((playerTurn-i+players.size())%players.size() == skip)
+                ++eqlen;
+        }
+        int lead = (playerTurn - eqlen + 1 + players.size()*2) % players.size();
         int idx=0;
         for(int i=1; i < onTable.size(); ++i) {
             Card top = onTable.get(idx);
@@ -235,6 +243,8 @@ public class Game {
                 idx = i;
             }
         }
+        if(idx >= skip)
+            ++idx;
         return (idx + lead) % players.size();
     }
     
@@ -352,16 +362,18 @@ public class Game {
                             return "false";
                         trump = suit;
                         setPhaseAll("tricks");
-                        playerTurn = nextPlayer(dealer);
                     } else {
                         trump = trumpCard.suit;
                         players.get(playerOrder.get(dealer)).addCard(trumpCard);
                         trumpCard = null;
                         setPhaseAll("discard");
-                        playerTurn = dealer;
                     }
                     alone = alonestr != null;
                     bidWinner = playerTurn;
+                    if(p.getPhase().equals("tricks"))
+                        playerTurn = nextPlayer(dealer);
+                    else
+                        playerTurn = dealer;
                     return "true";
                 }
                 return "false";

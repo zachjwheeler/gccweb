@@ -17,7 +17,7 @@ function Game() {
     this.alone = false
     
     this.partner = function(idx) {
-        return (idx+2)%players.length
+        return (idx+2)%this.players.length
     }
     
     // Assuming the game's in bidding phase
@@ -174,13 +174,25 @@ function doaction(action, actiondata) {
     ajaxaction(action, actiondata, 
         function(result) {
             if(result !== 'true') {
-                alert('Either we\'ve experienced a bug, or you\'re trying to hack the game.')
+                if(action !== 'play' || result !== 'false')
+                    alert('Either we\'ve experienced a bug, or you\'re trying to hack the game.')
             } else {
                 update()
             }
         }
     );
 }
+
+/*function clone(obj){
+    if(obj == null || typeof(obj) != 'object')
+        return obj;
+
+    var temp = obj.constructor(); // changed
+
+    for(var key in obj)
+        temp[key] = clone(obj[key]);
+    return temp;
+}*/
 
 gameobj = null
 function update() {

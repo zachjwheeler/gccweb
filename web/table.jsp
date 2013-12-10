@@ -112,7 +112,7 @@
                     
                     
                 }
-                if(diff('playerturn')) {
+                if(diff('playerturn') || diff('ontable')) {
                     for(var i=0; i < 4; ++i)
                     {
                         document.getElementById('otherPlayerName'+i).style.color = game.playerturn === i ? 'red' : ''
@@ -147,18 +147,30 @@
                     }
                     else if(game.phase === 'tricks')
                     {
-                        var startPlayer = (game.playerturn - game.ontable.length + 4) % 4;
+                        var skip = game.alone ? game.partner(game.bidwinner) : -1
+                        var eqlen = game.ontable.length
+                        for(var i=1; i <= game.ontable.length; ++i)
+                            if((game.playerturn-i+4)%4 === skip)
+                                ++eqlen
+                        var startPlayer = (game.playerturn - eqlen + 4) % 4;
                         var tempCards = new Array();
-                        var inert = game.ontable.length === 4 ? 1 : 0
+                        var inert = eqlen === 4 ? 1 : 0
                         for(var i = 0; i < 5 - game.ourtricks - game.theirtricks - 1 + inert; ++i)
                             tempCards.push(new Card());
                         for(var i = 0; i < 4; ++i)
                         {
                             var currentPlayer = (startPlayer+i)%4;
-                            if(i === game.ontable.length)
+                            if(i === eqlen)
                                 tempCards.push(new Card());
-                            if(currentPlayer !== 0)
+                            if(currentPlayer !== 0 && (!game.alone || currentPlayer !== game.partner(game.bidwinner)))
                                 displaycards(document.getElementById('otherPlayer' + currentPlayer),tempCards)
+                        }
+                        if(game.alone) {
+                            while(tempCards.length < 5)
+                                tempCards.push(new Card())
+                            var id = game.partner(game.bidwinner)
+                            id = id === 0 ? 'yourhand' : 'otherPlayer'+id
+                            displaycards(document.getElementById(id),tempCards)
                         }
                     }
                     
@@ -179,7 +191,7 @@
                         document.getElementById('middle').style.display = 'none'
                         document.getElementById('callTrump').style.display = game.playerturn === 0 ? 'inline' : 'none'
                     }
-                    else if(game.phase === 'tricks')
+                    else if(game.phase === 'tricks' || game.phase === 'end')
                     {
                         document.getElementById('middle').style.display = 'block'
                         document.getElementById('callTrump').style.display = 'none'
