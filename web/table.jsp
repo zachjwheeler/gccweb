@@ -100,9 +100,12 @@
                     } else {
                         for(var i=0; i < 4; ++i)
                         {
-                            document.getElementById('otherPlayerName'+i).innerHTML = game.players[i] +
-                                (i == game.bidwinner ? ': BIDWINNER ' : '') +
-                                (i == game.bidwinner && game.alone ? '(alone)' : '')
+                            var str = game.players[i]
+                            if(i === game.bidwinner && game.alone)
+                                str += ' (bid winner, alone)'
+                            else if(i === game.bidwinner)
+                                str += ' (bid winner)'
+                            document.getElementById('otherPlayerName'+i).innerHTML = str
                         }
                     }
                 }
@@ -258,18 +261,11 @@
             <input type='hidden' name='quit' value='quit'/>
             <input type='submit' value='Quit'/>
         </form>
-        <form method='POST' action='ctrl'>
+        <!-- <form method='POST' action='ctrl'>
             <input type='hidden' name='debug-stop' value='debug-stop'/>
             <input type='submit' value='Debug Stop'/>
-        </form>
+        </form> -->
         <p># players: <span id='playercount'>0</span></p>
-        <p><span id = 'trumpDispPar' style='display:none;'>Trump: <img id = 'trumpDisp' ></img></span></p>
-        <p>
-        <div id = 'YourTrickScorea' style='display:none;'>Your Trick Score: <span id = 'YourTrickScoreb'></span></div>
-        <div id = 'TheirTrickScorea' style='display:none;'>Their Trick Score: <span id = 'TheirTrickScoreb'></span></div>
-        <div id = 'YourScorea' style='display:none;'>Your Score: <span id = 'YourScoreb'></span></div>
-        <div id = 'TheirScorea' style='display:none;'>Their Score: <span id = 'TheirScoreb'></span></div>
-        </p>
         <span id='pregame'>
             <p>Player: <span id='pregame-username'><%= session.getAttribute("username") %></span></p>
             <span id='pregame-no-teammate' class="teammate-select" onclick='setTeammate("")'>No Teammate Request</span>
@@ -280,6 +276,13 @@
             <div id='readytext' style='display:none;'>Waiting for other players...</div>
         </span>
         <span id='table' style='display:none;'>
+            <p><span id = 'trumpDispPar' style='display:none;'>Trump: <img id = 'trumpDisp' ></img></span></p>
+            <p>
+            <div id = 'YourTrickScorea' style='display:none;'>Your Trick Score: <span id = 'YourTrickScoreb'></span></div>
+            <div id = 'TheirTrickScorea' style='display:none;'>Their Trick Score: <span id = 'TheirTrickScoreb'></span></div>
+            <div id = 'YourScorea' style='display:none;'>Your Score: <span id = 'YourScoreb'></span></div>
+            <div id = 'TheirScorea' style='display:none;'>Their Score: <span id = 'TheirScoreb'></span></div>
+            </p>
             <div style = 'text-align:center'> Partner Hand: <span id='otherPlayerName2'></span></div>
             <div id = 'otherPlayer2' style = 'text-align:center'></div>
             <table style='width:100%;'><tr>

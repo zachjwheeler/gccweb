@@ -102,10 +102,10 @@ public class Controller extends HttpServlet {
             game.playerQuit(username);
             session.invalidate();
             response.sendRedirect("index.jsp");
-        } else if(post && request.getParameter("debug-stop") != null) {
+        } /*else if(post && request.getParameter("debug-stop") != null) {
             session.setAttribute("username", game.getNextPlayer(username));
             response.sendRedirect("table.jsp");
-        } else {
+        }*/ else {
             if(post && (username == null || username.equals(""))) {
                 username = request.getParameter("username");
                 String password = request.getParameter("password");

@@ -21,7 +21,7 @@ public class Game {
     private long gameEnded;
     private Card[] deck;
     private int deckposn;
-    public static final boolean debug = true;
+    public static final boolean debug = false;
     
     public final static String[] suits = new String[]{"c","d","h","s"};
     public final static String[] types = new String[]{"a","k","q","j","10","9"};
