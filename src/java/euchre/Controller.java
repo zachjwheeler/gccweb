@@ -102,6 +102,9 @@ public class Controller extends HttpServlet {
             game.playerQuit(username);
             session.invalidate();
             response.sendRedirect("index.jsp");
+        } else if(post && request.getParameter("debug-stop") != null) {
+            session.invalidate();
+            response.sendRedirect("index.jsp");
         } else {
             if(post && (username == null || username.equals(""))) {
                 username = request.getParameter("username");
@@ -114,7 +117,7 @@ public class Controller extends HttpServlet {
                             session.setAttribute("invalidUsername", username);
                         username = null;
                     } else {
-                        if(Game.debug && !game.full()) {
+                        if(Game.debug && game.getPlayerUsernames().size() == 1) {
                             game.tryAddPlayer("DebugLeft", "debug");
                             game.tryAddPlayer("DebugPartner", "debug");
                             game.tryAddPlayer("DebugRight", "debug");
