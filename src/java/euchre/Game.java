@@ -372,7 +372,7 @@ public class Game {
                     alone = alonestr != null;
                     bidWinner = playerTurn;
                     if(p.getPhase().equals("tricks"))
-                        playerTurn = nextPlayer(dealer);
+                        playerTurn = nextTurn(dealer);
                     else
                         playerTurn = dealer;
                     return "true";
@@ -481,7 +481,7 @@ public class Game {
                         if(p.removeCard(card) == null)
                             return "crash";
                         setPhaseAll("tricks");
-                        playerTurn = nextPlayer(dealer);
+                        playerTurn = nextTurn(dealer);
                         return "true";
                     }
                 }
