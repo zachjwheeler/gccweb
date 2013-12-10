@@ -116,6 +116,18 @@
                     
                     
                 }
+                if(diff('ourscore') || diff('theirscore')) {
+                    if(game.ourscore < 0)
+                        alert('Your teammate quit!')
+                    else if(game.theirscore < 0)
+                        alert('A member of the other team quit!')
+                    else {
+                        if(game.ourscore >= 10)
+                            alert('Your team wins!')
+                        else if(game.theirscore >= 10)
+                            alert('You have been defeated.')
+                    }
+                }
                 if(diff('playerturn') || diff('ontable')) {
                     for(var i=0; i < 4; ++i)
                     {

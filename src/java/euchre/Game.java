@@ -58,6 +58,7 @@ public class Game {
         if(!players.containsKey(username)) return false;
         int p = playerOrder.indexOf(username);
         players.get(playerOrder.get(p)).setScore(-1);
+        players.get(playerOrder.get(partner(p))).setScore(-1);
         players.get(playerOrder.get(nextPlayer(p))).setScore(20);
         players.get(playerOrder.get(nextPlayer(partner(p)))).setScore(20);
         endGame();
