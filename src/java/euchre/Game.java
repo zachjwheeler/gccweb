@@ -101,6 +101,10 @@ public class Game {
         return v >= 0 ? (v - me + players.size()) % players.size() : -1;
     }
     
+    public String getNextPlayer(String u) {
+        return playerOrder.get(nextPlayer(playerOrder.indexOf(u)));
+    }
+    
     public GameBean getBean(String username) {
         if(username == null || !players.containsKey(username)) return null;
         Player player = players.get(username);
